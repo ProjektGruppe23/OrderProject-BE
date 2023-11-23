@@ -4,6 +4,8 @@ package com.example.orderprojectbe.service.reverb;
 import com.example.orderprojectbe.model.Order;
 import com.example.orderprojectbe.repository.OrderRepository;
 import com.example.orderprojectbe.service.reverb.ReverbApiServiceGetAllOrders;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -14,8 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,7 +39,7 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
     }
 
     // Update the URL to the new endpoint
-    String regionUrl = "https://api.reverb.com/api/my/orders/selling/all";
+    String reverbUrl = "https://api.reverb.com/api/my/orders/selling/awaiting_shipment";
 
     private void saveOrders(List<Order> orders) {
         orders.forEach(reg -> orderRepository.save(reg));
@@ -48,19 +52,48 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
 
         RequestEntity<Void> requestEntity;
         try {
-            requestEntity = new RequestEntity<>(headers, HttpMethod.GET, new URI(regionUrl));
+            System.out.println("inde i try");
+            requestEntity = new RequestEntity<>(headers, HttpMethod.GET, new URI(reverbUrl));
         } catch (URISyntaxException e) {
             throw new RuntimeException("Error creating request URI", e);
         }
 
-        ResponseEntity<List<Order>> regionResponse = restTemplate.exchange(
+        ResponseEntity<String> rawResponse = restTemplate.exchange(
                 requestEntity,
-                new ParameterizedTypeReference<List<Order>>() {});
+                String.class);
 
-        // ResponseEntity wraps an HTTP response and body
-        List<Order> orders = regionResponse.getBody();
-        saveOrders(orders);
-        return orders;
+        String responseBody = rawResponse.getBody();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode root = objectMapper.readTree(responseBody);
+
+            // Assuming the orders are in an array called "orders"
+            JsonNode ordersNode = root.get("orders");
+
+            // Process each order
+            List<Order> orders = new ArrayList<>();
+            for (JsonNode orderNode : ordersNode) {
+                Order order = new Order();
+
+                // Extract specific fields from the orderNode and set them in the Order object
+                order.setOrder_number(orderNode.get("order_number").asInt());
+                order.setTitle(orderNode.get("title").asText());
+                order.setPrice(orderNode.get("amount_product").get("amount").asDouble());
+                order.setQuantity(orderNode.get("quantity").asInt());
+                // Set other fields accordingly
+
+                orders.add(order);
+            }
+
+            // Save orders to the database if needed
+            saveOrders(orders);
+
+            System.out.println("Processed Orders: " + orders);
+            return orders;
+        } catch (IOException e) {
+            throw new RuntimeException("Error parsing JSON response", e);
+        }
     }
 }
 
