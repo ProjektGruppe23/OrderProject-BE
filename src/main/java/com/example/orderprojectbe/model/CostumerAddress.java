@@ -1,9 +1,11 @@
 package com.example.orderprojectbe.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 @Entity
 public class CostumerAddress
 {
@@ -18,7 +20,7 @@ public class CostumerAddress
     private String costumerName;
     private String phone;
     @ManyToOne
-    @JoinColumn(name = "country", referencedColumnName = "countryId")
+    @JoinColumn(name = "countryId", referencedColumnName = "countryId")
     private Country country;
 
     @OneToMany(mappedBy = "costumerAddress", cascade = CascadeType.REMOVE)

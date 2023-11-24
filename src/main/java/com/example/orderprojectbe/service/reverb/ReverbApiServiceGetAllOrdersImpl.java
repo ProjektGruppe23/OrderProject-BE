@@ -1,8 +1,13 @@
 package com.example.orderprojectbe.service.reverb;
 
 
+import com.example.orderprojectbe.model.CostumerAddress;
+import com.example.orderprojectbe.model.Country;
 import com.example.orderprojectbe.model.Order;
+import com.example.orderprojectbe.model.Vendor;
+import com.example.orderprojectbe.repository.CostumerAddressRepository;
 import com.example.orderprojectbe.repository.OrderRepository;
+import com.example.orderprojectbe.repository.VendorRepository;
 import com.example.orderprojectbe.service.reverb.ReverbApiServiceGetAllOrders;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +25,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllOrders
@@ -29,6 +36,12 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
     private final RestTemplate restTemplate;
     @Autowired
     OrderRepository orderRepository;
+
+    @Autowired
+    VendorRepository vendorRepository;
+
+    @Autowired
+    CostumerAddressRepository costumerAddressRepository;
 
     @Value("${reverb.api.key}")  // Assuming you have a property for the API key in your application.properties or application.yml
     private String apiKey;
@@ -42,7 +55,11 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
     String reverbUrl = "https://api.reverb.com/api/my/orders/selling/awaiting_shipment";
 
     private void saveOrders(List<Order> orders) {
-        orders.forEach(reg -> orderRepository.save(reg));
+        orders.forEach(order -> orderRepository.save(order));
+    }
+
+    private void saveCostumerAddress(Set<CostumerAddress> costumerAddressSet) {
+        costumerAddressSet.forEach(costumerAddress -> costumerAddressRepository.save(costumerAddress));
     }
 
     @Override
@@ -73,17 +90,40 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
 
             // Process each order
             List<Order> orders = new ArrayList<>();
+            Set<CostumerAddress> costumerAddressSet = new HashSet<>();
             for (JsonNode orderNode : ordersNode) {
                 Order order = new Order();
 
+                CostumerAddress costumerAddress = new CostumerAddress();
+                Country country = new Country();
+
                 // Extract specific fields from the orderNode and set them in the Order object
-                order.setOrder_number(orderNode.get("order_number").asInt());
-                order.setTitle(orderNode.get("title").asText());
+                order.setOrderApiId(orderNode.get("order_number").asInt());
+                order.setProductName(orderNode.get("title").asText());
                 order.setPrice(orderNode.get("amount_product").get("amount").asDouble());
                 order.setQuantity(orderNode.get("quantity").asInt());
-                // Set other fields accordingly
 
+                //order.setVendor(vendorRepository.findByVendorName("Reverb"));
+
+                String displayLocation = orderNode.get("shipping_address").get("display_location").asText();
+                country.setCountryName(country.getReverbCountrySubstring(displayLocation));
+
+                costumerAddress.setCountry(country);
+                costumerAddress.setCity(orderNode.get("shipping_address").get("locality").asText());
+                costumerAddress.setStreetAddress(orderNode.get("shipping_address").get("street_address").asText());
+                costumerAddress.setExtendedAddress(orderNode.get("shipping_address").get("extended_address").asText());
+                costumerAddress.setPostalCode(orderNode.get("shipping_address").get("postal_code").asText());
+                costumerAddress.setCostumerName(orderNode.get("shipping_address").get("name").asText());
+                costumerAddress.setPhone(orderNode.get("shipping_address").get("phone").asText());
+
+
+                order.setCostumerAddress(costumerAddress);
+
+
+                costumerAddressSet.add(costumerAddress);
+                saveCostumerAddress(costumerAddressSet);
                 orders.add(order);
+
             }
 
             // Save orders to the database if needed
