@@ -1,5 +1,6 @@
 package com.example.orderprojectbe.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,4 +15,12 @@ public class Order
     private String title;
     private double price;
     private int quantity;
+    @ManyToOne
+    @JoinColumn(name = "costumerAddress", referencedColumnName = "costumerAddressId")
+    @JsonBackReference
+    private CostumerAddress costumerAddress;
+
+    @ManyToOne
+    @JoinColumn(name = "vendor", referencedColumnName = "vendorId")
+    private Vendor vendor;
 }
