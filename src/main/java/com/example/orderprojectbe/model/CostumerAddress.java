@@ -10,12 +10,12 @@ public class CostumerAddress
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int costumerAddressId;
-    private String locality;
-    private String street_address;
-    private String extended_address;
-    private String postal_code;
+    private String city;
+    private String streetAddress;
+    private String extendedAddress;
+    private String postalCode;
 
-    private String name;
+    private String costumerName;
     private String phone;
     @ManyToOne
     @JoinColumn(name = "country", referencedColumnName = "countryId")

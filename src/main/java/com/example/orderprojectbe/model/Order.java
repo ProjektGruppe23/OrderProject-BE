@@ -11,8 +11,9 @@ public class Order
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int order_number;
-    private String title;
+    private int orderId;
+    private int orderApiId;
+    private String productName;
     private double price;
     private int quantity;
     @ManyToOne
