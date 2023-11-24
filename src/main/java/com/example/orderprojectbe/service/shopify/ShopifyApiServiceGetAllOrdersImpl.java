@@ -49,8 +49,6 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
 
     @Override
     public List<Order> getAllOrders() {
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Authorization", "Bearer " + apiKey);
         HttpHeaders headers = new HttpHeaders();
 
         // Encode API key and token
@@ -79,25 +77,33 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
         try {
             JsonNode root = objectMapper.readTree(responseBody);
 
-            // Assuming the orders are in an array called "orders"
             JsonNode ordersNode = root.get("orders");
+            if (ordersNode == null) {
+                throw new RuntimeException("No 'orders' node found in JSON response");
+            }
 
-            // Process each order
             List<Order> orders = new ArrayList<>();
             for (JsonNode orderNode : ordersNode) {
                 Order order = new Order();
+                order.setOrderApiId(orderNode.get("id").asInt()); // Extract the order ID
 
-                // Extract specific fields from the orderNode and set them in the Order object
-                order.setOrderApiId(orderNode.get("id").asInt());
-                order.setProductName(orderNode.get("line_items").get("name").asText());
-                order.setPrice(orderNode.get("line_items").get("price").asDouble());
-                order.setQuantity(orderNode.get("line_items").get("quantity").asInt());
-                // Set other fields accordingly
+                JsonNode lineItemsNode = orderNode.get("line_items");
+                if (lineItemsNode != null && lineItemsNode.isArray()) {
+                    for (JsonNode itemNode : lineItemsNode) {
+                        String productName = itemNode.get("name").asText(""); // Extract product name
+                        double price = Double.parseDouble(itemNode.get("price_set").get("shop_money").get("amount").asText("0.0")); // Extract price
+                        int quantity = itemNode.get("quantity").asInt(0); // Extract quantity
+
+                        // Set these values in the Order object
+                        order.setProductName(productName);
+                        order.setPrice(price);
+                        order.setQuantity(quantity);
+                    }
+                }
 
                 orders.add(order);
             }
 
-            // Save orders to the database if needed
             saveOrders(orders);
 
             System.out.println("Processed Orders: " + orders);
@@ -105,6 +111,7 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
         } catch (IOException e) {
             throw new RuntimeException("Error parsing JSON response", e);
         }
+
     }
 }
 
