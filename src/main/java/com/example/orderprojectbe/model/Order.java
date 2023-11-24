@@ -13,7 +13,7 @@ public class Order
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int orderId;
     private int orderApiId;
-    private String title;
+    private String productName;
     private double price;
     private int quantity;
     @ManyToOne
