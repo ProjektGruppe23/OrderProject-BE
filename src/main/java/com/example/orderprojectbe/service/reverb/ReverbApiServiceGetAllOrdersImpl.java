@@ -77,8 +77,8 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
                 Order order = new Order();
 
                 // Extract specific fields from the orderNode and set them in the Order object
-                order.setOrder_number(orderNode.get("order_number").asInt());
-                order.setTitle(orderNode.get("title").asText());
+                order.setOrderApiId(orderNode.get("order_number").asInt());
+                order.setProductName(orderNode.get("title").asText());
                 order.setPrice(orderNode.get("amount_product").get("amount").asDouble());
                 order.setQuantity(orderNode.get("quantity").asInt());
                 // Set other fields accordingly
