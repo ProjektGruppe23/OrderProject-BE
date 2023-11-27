@@ -3,9 +3,7 @@ package com.example.orderprojectbe.service.shopify;
 import com.example.orderprojectbe.model.CostumerAddress;
 import com.example.orderprojectbe.model.Country;
 import com.example.orderprojectbe.model.Order;
-import com.example.orderprojectbe.repository.CostumerAddressRepository2;
-import com.example.orderprojectbe.repository.CountryRepository2;
-import com.example.orderprojectbe.repository.OrderRepository;
+import com.example.orderprojectbe.repository.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +32,13 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
     OrderRepository orderRepository;
 
     @Autowired
-    CostumerAddressRepository2 costumerAddressRepository;
+    CostumerAddressRepository costumerAddressRepository;
 
     @Autowired
-    CountryRepository2 countryRepository;
+    CountryRepository countryRepository;
+
+    @Autowired
+    VendorRepository vendorRepository;
 
     @Value("${shopify.api.key}")  // Assuming you have a property for the API key in your application.properties or application.yml
     private String apiKey;
@@ -108,6 +109,8 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
                         order.setProductName(productName);
                         order.setPrice(price);
                         order.setQuantity(quantity);
+                        order.setVendor(vendorRepository.findByVendorName("Shopify"));
+
                     }
                 }
 
@@ -142,7 +145,7 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
 
             saveOrders(orders);
 
-            System.out.println("Processed Orders: " + orders);
+//            System.out.println("Processed Orders: " + orders);
             return orders;
         } catch (IOException e) {
             throw new RuntimeException("Error parsing JSON response", e);
