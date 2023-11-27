@@ -6,6 +6,7 @@ import com.example.orderprojectbe.model.Country;
 import com.example.orderprojectbe.model.Order;
 import com.example.orderprojectbe.model.Vendor;
 import com.example.orderprojectbe.repository.CostumerAddressRepository;
+import com.example.orderprojectbe.repository.CountryRepository;
 import com.example.orderprojectbe.repository.OrderRepository;
 import com.example.orderprojectbe.repository.VendorRepository;
 import com.example.orderprojectbe.service.reverb.ReverbApiServiceGetAllOrders;
@@ -41,6 +42,9 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
     VendorRepository vendorRepository;
 
     @Autowired
+    CountryRepository countryRepository;
+
+    @Autowired
     CostumerAddressRepository costumerAddressRepository;
 
     @Value("${reverb.api.key}")  // Assuming you have a property for the API key in your application.properties or application.yml
@@ -52,7 +56,7 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
     }
 
     // Update the URL to the new endpoint
-    String reverbUrl = "https://api.reverb.com/api/my/orders/selling/awaiting_shipment";
+    String reverbUrl = "https://api.reverb.com/api/my/orders/selling/all"; //awaiting_shipment
 
     private void saveOrders(List<Order> orders) {
         orders.forEach(order -> orderRepository.save(order));
@@ -60,6 +64,10 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
 
     private void saveCostumerAddress(Set<CostumerAddress> costumerAddressSet) {
         costumerAddressSet.forEach(costumerAddress -> costumerAddressRepository.save(costumerAddress));
+    }
+
+    private void saveCountry(Set<Country> countrySet) {
+        countrySet.forEach(country -> countryRepository.save(country));
     }
 
     @Override
@@ -91,6 +99,7 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
             // Process each order
             List<Order> orders = new ArrayList<>();
             Set<CostumerAddress> costumerAddressSet = new HashSet<>();
+            Set<Country> countrySet = new HashSet<>();
             for (JsonNode orderNode : ordersNode) {
                 Order order = new Order();
 
@@ -106,9 +115,19 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
                 //order.setVendor(vendorRepository.findByVendorName("Reverb"));
 
                 String displayLocation = orderNode.get("shipping_address").get("display_location").asText();
-                country.setCountryName(country.getReverbCountrySubstring(displayLocation));
+                String countryName = country.getReverbCountrySubstring(displayLocation);
 
-                costumerAddress.setCountry(country);
+                if(!countryRepository.findCountryByCountryName(countryName).isPresent())
+                {
+                    country.setCountryName(countryName);
+                    costumerAddress.setCountry(country);
+                    countrySet.add(country);
+                    saveCountry(countrySet);
+                } else
+                {
+                    costumerAddress.setCountry(countryRepository.findCountryByCountryName(countryName).get());
+                }
+
                 costumerAddress.setCity(orderNode.get("shipping_address").get("locality").asText());
                 costumerAddress.setStreetAddress(orderNode.get("shipping_address").get("street_address").asText());
                 costumerAddress.setExtendedAddress(orderNode.get("shipping_address").get("extended_address").asText());
