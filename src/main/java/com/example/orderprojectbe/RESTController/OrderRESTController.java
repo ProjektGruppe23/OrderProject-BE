@@ -3,6 +3,7 @@ package com.example.orderprojectbe.RESTController;
 import com.example.orderprojectbe.model.Order;
 import com.example.orderprojectbe.repository.OrderRepository;
 import com.example.orderprojectbe.service.reverb.ReverbApiServiceGetAllOrders;
+import com.example.orderprojectbe.service.shopify.ShopifyApiServiceGetAllOrders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,6 +20,9 @@ public class OrderRESTController
     ReverbApiServiceGetAllOrders reverbApiServiceGetAllOrders;
 
     @Autowired
+    ShopifyApiServiceGetAllOrders shopifyApiServiceGetAllOrders;
+
+    @Autowired
     OrderRepository orderRepository;
 
 
@@ -28,4 +32,11 @@ public class OrderRESTController
         List<Order> lstOrders = reverbApiServiceGetAllOrders.getAllOrders();
         return lstOrders;
     }
+    @GetMapping("/getordersshopify")
+    public List<Order> getOrdersShopify()
+    {
+        List<Order> lstOrders = shopifyApiServiceGetAllOrders.getAllOrders();
+        return lstOrders;
+    }
+
 }
