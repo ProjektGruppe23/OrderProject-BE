@@ -17,11 +17,11 @@ public class Order
     private double price;
     private int quantity;
     @ManyToOne
-    @JoinColumn(name = "costumerAddress", referencedColumnName = "costumerAddressId")
+    @JoinColumn(name = "costumerAddressId", referencedColumnName = "costumerAddressId")
     @JsonBackReference
     private CostumerAddress costumerAddress;
 
     @ManyToOne
-    @JoinColumn(name = "vendor", referencedColumnName = "vendorId")
+    @JoinColumn(name = "vendorId", referencedColumnName = "vendorId")
     private Vendor vendor;
 }
