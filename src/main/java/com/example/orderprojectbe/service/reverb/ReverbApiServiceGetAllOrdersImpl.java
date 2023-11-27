@@ -117,15 +117,15 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
                 String displayLocation = orderNode.get("shipping_address").get("display_location").asText();
                 String countryName = country.getReverbCountrySubstring(displayLocation);
 
-                if(!countryRepository.findCountryByCountryName(countryName).isPresent())
+                if(countryRepository.findCountryByCountryName(countryName).isPresent())
+                {
+                    costumerAddress.setCountry(countryRepository.findCountryByCountryName(countryName).get());
+                } else
                 {
                     country.setCountryName(countryName);
                     costumerAddress.setCountry(country);
                     countrySet.add(country);
                     saveCountry(countrySet);
-                } else
-                {
-                    costumerAddress.setCountry(countryRepository.findCountryByCountryName(countryName).get());
                 }
 
                 costumerAddress.setCity(orderNode.get("shipping_address").get("locality").asText());
