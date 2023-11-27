@@ -17,7 +17,5 @@ public class Vendor {
 
     @OneToMany(mappedBy = "vendor")
     private List<Order> orders;
-
-
 }
 
