@@ -1,6 +1,10 @@
 package com.example.orderprojectbe.service.shopify;
 
+import com.example.orderprojectbe.model.CostumerAddress;
+import com.example.orderprojectbe.model.Country;
 import com.example.orderprojectbe.model.Order;
+import com.example.orderprojectbe.repository.CostumerAddressRepository;
+import com.example.orderprojectbe.repository.CountryRepository;
 import com.example.orderprojectbe.repository.OrderRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +32,12 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
     private final RestTemplate restTemplate;
     @Autowired
     OrderRepository orderRepository;
+
+    @Autowired
+    CostumerAddressRepository costumerAddressRepository;
+
+    @Autowired
+    CountryRepository countryRepository;
 
     @Value("${shopify.api.key}")  // Assuming you have a property for the API key in your application.properties or application.yml
     private String apiKey;
@@ -100,6 +110,32 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
                         order.setQuantity(quantity);
                     }
                 }
+
+//                JsonNode shippingAddressNode = orderNode.get("shipping_address");
+//                if (shippingAddressNode != null) {
+//                    CostumerAddress costumerAddress = new CostumerAddress();
+//
+//                    costumerAddress.setCity(shippingAddressNode.get("city").asText());
+//                    costumerAddress.setStreetAddress(shippingAddressNode.get("address1").asText());
+//                    costumerAddress.setExtendedAddress(shippingAddressNode.get("address2").asText());
+//                    costumerAddress.setPostalCode(shippingAddressNode.get("zip").asText());
+//                    costumerAddress.setCostumerName(shippingAddressNode.get("name").asText());
+//                    costumerAddress.setPhone(shippingAddressNode.get("phone").asText());
+//
+//                    String countryName = shippingAddressNode.get("country").asText();
+//                    Country country;
+//                    var countryOptional = countryRepository.findCountryByCountryName(countryName);
+//                    if (countryOptional.isPresent()) {
+//                        country = countryOptional.get();
+//                    } else {
+//                        country = new Country();
+//                        country.setCountryName(countryName);
+//                        countryRepository.save(country); // Assuming you have a save method in your countryRepository
+//                    }
+//                    costumerAddress.setCountry(country);
+//
+//                    order.setCostumerAddress(costumerAddress);
+//                }
 
                 orders.add(order);
             }
