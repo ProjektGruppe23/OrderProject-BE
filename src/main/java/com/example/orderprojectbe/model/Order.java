@@ -1,12 +1,15 @@
 package com.example.orderprojectbe.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
 @Entity
 @Table(name = "`order`")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "orderId")
 public class Order
 {
     @Id
@@ -18,7 +21,6 @@ public class Order
     private int quantity;
     @ManyToOne
     @JoinColumn(name = "costumerAddressId", referencedColumnName = "costumerAddressId")
-    @JsonBackReference
     private CostumerAddress costumerAddress;
 
     @ManyToOne

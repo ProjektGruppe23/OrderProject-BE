@@ -112,7 +112,7 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
                 order.setPrice(orderNode.get("amount_product").get("amount").asDouble());
                 order.setQuantity(orderNode.get("quantity").asInt());
 
-                //order.setVendor(vendorRepository.findByVendorName("Reverb"));
+                order.setVendor(vendorRepository.findByVendorName("Reverb"));
 
                 String displayLocation = orderNode.get("shipping_address").get("display_location").asText();
                 String countryName = country.getReverbCountrySubstring(displayLocation);
@@ -148,7 +148,7 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
             // Save orders to the database if needed
             saveOrders(orders);
 
-            System.out.println("Processed Orders: " + orders);
+            //System.out.println("Processed Orders: " + orders);
             return orders;
         } catch (IOException e) {
             throw new RuntimeException("Error parsing JSON response", e);
