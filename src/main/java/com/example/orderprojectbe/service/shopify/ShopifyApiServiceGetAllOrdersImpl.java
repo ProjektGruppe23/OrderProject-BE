@@ -111,32 +111,32 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
                     }
                 }
 
-//                JsonNode shippingAddressNode = orderNode.get("shipping_address");
-//                if (shippingAddressNode != null) {
-//                    CostumerAddress costumerAddress = new CostumerAddress();
-//
-//                    costumerAddress.setCity(shippingAddressNode.get("city").asText());
-//                    costumerAddress.setStreetAddress(shippingAddressNode.get("address1").asText());
-//                    costumerAddress.setExtendedAddress(shippingAddressNode.get("address2").asText());
-//                    costumerAddress.setPostalCode(shippingAddressNode.get("zip").asText());
-//                    costumerAddress.setCostumerName(shippingAddressNode.get("name").asText());
-//                    costumerAddress.setPhone(shippingAddressNode.get("phone").asText());
-//
-//                    String countryName = shippingAddressNode.get("country").asText();
-//                    Country country;
-//                    var countryOptional = countryRepository.findCountryByCountryName(countryName);
-//                    if (countryOptional.isPresent()) {
-//                        country = countryOptional.get();
-//                    } else {
-//                        country = new Country();
-//                        country.setCountryName(countryName);
-//                        countryRepository.save(country); // Assuming you have a save method in your countryRepository
-//                    }
-//                    costumerAddress.setCountry(country);
-//
-//                    order.setCostumerAddress(costumerAddress);
-//                }
+                JsonNode shippingAddressNode = orderNode.get("shipping_address");
+                if (shippingAddressNode != null) {
+                    CostumerAddress costumerAddress = new CostumerAddress();
 
+                    costumerAddress.setCity(shippingAddressNode.get("city").asText());
+                    costumerAddress.setStreetAddress(shippingAddressNode.get("address1").asText());
+                    costumerAddress.setExtendedAddress(shippingAddressNode.get("address2").asText());
+                    costumerAddress.setPostalCode(shippingAddressNode.get("zip").asText());
+                    costumerAddress.setCostumerName(shippingAddressNode.get("name").asText());
+                    costumerAddress.setPhone(shippingAddressNode.get("phone").asText());
+
+                    String countryName = shippingAddressNode.get("country").asText();
+                    Country country;
+                    var countryOptional = countryRepository.findCountryByCountryName(countryName);
+                    if (countryOptional.isPresent()) {
+                        country = countryOptional.get();
+                    } else {
+                        country = new Country();
+                        country.setCountryName(countryName);
+                        countryRepository.save(country); // Assuming you have a save method in your countryRepository
+                    }
+                    costumerAddress.setCountry(country);
+                    costumerAddressRepository.save(costumerAddress);
+                    order.setCostumerAddress(costumerAddress);
+                }
+                orderRepository.save(order);
                 orders.add(order);
             }
 
