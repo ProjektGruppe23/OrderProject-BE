@@ -20,7 +20,7 @@ public class CostumerAddress
     private String costumerName;
     private String phone;
     @ManyToOne
-    @JoinColumn(name = "country", referencedColumnName = "countryId")
+    @JoinColumn(name = "countryId", referencedColumnName = "countryId")
     private Country country;
 
     @OneToMany(mappedBy = "costumerAddress", cascade = CascadeType.REMOVE)
