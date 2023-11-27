@@ -3,8 +3,8 @@ package com.example.orderprojectbe.service.shopify;
 import com.example.orderprojectbe.model.CostumerAddress;
 import com.example.orderprojectbe.model.Country;
 import com.example.orderprojectbe.model.Order;
-import com.example.orderprojectbe.repository.CostumerAddressRepository;
-import com.example.orderprojectbe.repository.CountryRepository;
+import com.example.orderprojectbe.repository.CostumerAddressRepository2;
+import com.example.orderprojectbe.repository.CountryRepository2;
 import com.example.orderprojectbe.repository.OrderRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,10 +34,10 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
     OrderRepository orderRepository;
 
     @Autowired
-    CostumerAddressRepository costumerAddressRepository;
+    CostumerAddressRepository2 costumerAddressRepository;
 
     @Autowired
-    CountryRepository countryRepository;
+    CountryRepository2 countryRepository;
 
     @Value("${shopify.api.key}")  // Assuming you have a property for the API key in your application.properties or application.yml
     private String apiKey;
