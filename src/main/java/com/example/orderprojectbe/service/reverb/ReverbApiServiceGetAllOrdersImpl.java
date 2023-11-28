@@ -148,7 +148,7 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
             // Save orders to the database if needed
             saveOrders(orders);
 
-            //System.out.println("Processed Orders: " + orders);
+            System.out.println("Processed Orders: " + orders);
             return orders;
         } catch (IOException e) {
             throw new RuntimeException("Error parsing JSON response", e);

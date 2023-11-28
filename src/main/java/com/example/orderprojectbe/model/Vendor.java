@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class Vendor {
 
     private String vendorName;
 
-
+    @ToString.Exclude
     @OneToMany(mappedBy = "vendor")
     private List<Order> orders;
 }
