@@ -18,6 +18,9 @@ public class Country {
     @OneToMany(mappedBy = "country")
     private List<CostumerAddress> costumerAddress;
 
+    @OneToMany(mappedBy = "country")
+    private List<ArchivedOrder> archivedOrders;
+
     public String getReverbCountrySubstring(String displayLocation)
     {
         String[] substring = displayLocation.split(",");

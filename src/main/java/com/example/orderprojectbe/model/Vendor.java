@@ -23,5 +23,9 @@ public class Vendor {
 
     @OneToMany(mappedBy = "vendor")
     private List<Order> orders;
+
+    @OneToMany(mappedBy = "vendor")
+    private List<ArchivedOrder> archivedOrders;
+
 }
 
