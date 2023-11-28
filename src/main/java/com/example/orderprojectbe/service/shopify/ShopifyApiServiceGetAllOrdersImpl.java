@@ -51,7 +51,7 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
         this.restTemplate = restTemplate;
     }
 
-    String shopifyUrl = "https://" + apiKey + ":" + tokenKey + "@8eff11-2.myshopify.com/admin/api/2023-01/orders.json?status=any;";
+    String shopifyUrl = "https://" + apiKey + ":" + tokenKey + "@8eff11-2.myshopify.com/admin/api/2023-01/orders.json";
 
 
     private void saveOrders(List<Order> orders) {
@@ -137,7 +137,15 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
                     }
                     costumerAddress.setCountry(country);
                     costumerAddressRepository.save(costumerAddress);
+
                     order.setCostumerAddress(costumerAddress);
+                }
+                List<Order> ordersCheckList = orderRepository.findOrderApiIdAndVendor(order.getOrderId(), order.getVendor());
+                if (!ordersCheckList.isEmpty()) {
+                    // Order already exists, you may choose to skip or update it as needed
+                    // For example, you can log a message and continue with the next order
+                    System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor() + " already exists. Skipping...");
+                    continue;
                 }
                 orderRepository.save(order);
                 orders.add(order);

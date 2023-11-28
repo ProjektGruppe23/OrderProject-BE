@@ -26,4 +26,15 @@ public class Order
     @ManyToOne
     @JoinColumn(name = "vendorId", referencedColumnName = "vendorId")
     private Vendor vendor;
+
+    public Order()
+    {
+
+    }
+
+    public Order(int orderApiId, Vendor vendor)
+    {
+        this.orderApiId = orderApiId;
+        this.vendor = vendor;
+    }
 }
