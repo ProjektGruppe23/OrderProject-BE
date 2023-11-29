@@ -11,7 +11,7 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Integer>
 {
     @Query("SELECT new com.example.orderprojectbe.model.Order(order.orderApiId, order.vendor) FROM Order order")
-    List<Order> findOrderApiIdAndVendor(@Param("orderId") int orderId, @Param("vendor") Vendor vendor);
+    List<Order> findOrderApiIdAndVendor(@Param("orderId") String orderId, @Param("vendor") Vendor vendor);
 
 
 }

@@ -1,6 +1,8 @@
 package com.example.orderprojectbe.RESTController;
 
+import com.example.orderprojectbe.model.CostumerAddress;
 import com.example.orderprojectbe.model.Order;
+import com.example.orderprojectbe.repository.CostumerAddressRepository;
 import com.example.orderprojectbe.repository.OrderRepository;
 import com.example.orderprojectbe.service.reverb.ReverbApiServiceGetAllOrders;
 import com.example.orderprojectbe.service.shopify.ShopifyApiServiceGetAllOrders;
@@ -25,6 +27,9 @@ public class OrderRESTController
     @Autowired
     OrderRepository orderRepository;
 
+    @Autowired
+    CostumerAddressRepository CostumerAddressRepository;
+
 
     @GetMapping("/getorders")
     public List<Order> getOrders()
@@ -32,10 +37,18 @@ public class OrderRESTController
         List<Order> lstOrders = reverbApiServiceGetAllOrders.getAllOrders();
         return lstOrders;
     }
+
     @GetMapping("/getordersshopify")
     public List<Order> getOrdersShopify()
     {
-        List<Order> lstOrders = shopifyApiServiceGetAllOrders.getAllOrders();
+        List<Order> lstOrders = shopifyApiServiceGetAllOrders.loadOrdersFromApi();
+        return lstOrders;
+    }
+
+    @GetMapping("/getordersfromdb")
+    public List<Order> getOrdersFromDB()
+    {
+        List<Order> lstOrders = orderRepository.findAll();
         return lstOrders;
     }
 
