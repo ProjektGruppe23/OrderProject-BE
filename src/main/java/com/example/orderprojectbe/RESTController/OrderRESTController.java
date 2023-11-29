@@ -56,12 +56,12 @@ public class OrderRESTController
     {
         try
         {
-            Optional<Order> optionalOrder = orderRepository.findById(orderId);
-            if ( optionalOrder.isPresent() )
+            Optional<Order> selectedOrder = orderRepository.findById(orderId);
+            if ( selectedOrder.isPresent() )
             {
                 // Order with the specified ID exists, so delete it
                 System.out.println("order with id " + orderId + " deleted successfully");
-                System.out.println("ID: " + orderId + ", Api ID: " + optionalOrder.get().getOrderApiId() + ", Product name: " + optionalOrder.get().getProductName() + ", Quantity: " + optionalOrder.get().getQuantity() + ", Vendor: " + optionalOrder.get().getVendor());
+                System.out.println("ID: " + orderId + ", Api ID: " + selectedOrder.get().getOrderApiId() + ", Product name: " + selectedOrder.get().getProductName() + ", Quantity: " + selectedOrder.get().getQuantity() + ", Vendor: " + selectedOrder.get().getVendor());
                 orderRepository.deleteById(orderId);
                 return ResponseEntity.ok("Order deleted successfully");
             }
