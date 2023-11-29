@@ -1,6 +1,7 @@
 package com.example.orderprojectbe.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,6 +17,7 @@ public class Country {
     private int countryId;
     private String countryName;
     @OneToMany(mappedBy = "country")
+    @JsonBackReference
     private List<CostumerAddress> costumerAddress;
 
     public String getReverbCountrySubstring(String displayLocation)

@@ -1,5 +1,6 @@
 package com.example.orderprojectbe.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class CostumerAddress
     private String costumerName;
     private String phone;
     @ManyToOne
+    @JsonManagedReference
     @JoinColumn(name = "countryId", referencedColumnName = "countryId")
     private Country country;
 
