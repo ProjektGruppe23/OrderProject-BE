@@ -19,9 +19,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAllOrders {
@@ -56,6 +54,9 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
     private void saveOrders(List<Order> orders) {
         orders.forEach(reg -> orderRepository.save(reg));
     }
+    private void saveCostumerAddress(List<CostumerAddress> costumerAddressSet) {
+        costumerAddressSet.forEach(costumerAddress -> costumerAddressRepository.save(costumerAddress));
+    }
 
     @Override
     public List<Order> loadOrdersFromApi() {
@@ -84,6 +85,7 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
             }
 
             List<Order> orders = new ArrayList<>();
+            List<CostumerAddress> costumerAddressList = new ArrayList<>();
             for (JsonNode orderNode : ordersNode) {
                 Order order = new Order();
                 order.setOrderApiId(orderNode.get("id").asText());
@@ -122,10 +124,16 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
                         country.setCountryName(countryName);
                         countryRepository.save(country);
                     }
-                    costumerAddress.setCountry(country);
-                    costumerAddressRepository.save(costumerAddress);
-
-                    order.setCostumerAddress(costumerAddress);
+                    var costumerAddressOptional = costumerAddressRepository.findCostumerAddress(costumerAddress.getCity(), costumerAddress.getStreetAddress(), costumerAddress.getExtendedAddress(), costumerAddress.getPostalCode());
+                    if (costumerAddressOptional.isPresent()) {
+                        System.out.println(" already exists. Skipping...");
+                        order.setCostumerAddress(costumerAddressOptional.get());
+                    } else {
+                        costumerAddress.setCountry(country);
+                        System.out.println(" inserted.");
+                        order.setCostumerAddress(costumerAddress);
+                        costumerAddressRepository.save(costumerAddress);
+                    }
                 }
 
                 List<Order> ordersCheckList = orderRepository.findOrderApiIdAndVendor(order.getOrderApiId(), order.getVendor());
@@ -136,7 +144,7 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
                     System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor() + " inserted.");
                 }
             }
-
+            //saveCostumerAddress(costumerAddressList);
             saveOrders(orders);
 
             return orders;

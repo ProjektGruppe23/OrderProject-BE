@@ -27,4 +27,15 @@ public class CostumerAddress
 
     @OneToMany(mappedBy = "costumerAddress", cascade = CascadeType.REMOVE)
     private List<Order> order;
+
+    public CostumerAddress(){};
+
+    public CostumerAddress(String city, String streetAddress, String extendedAddress, String postalCode)
+    {
+        this.city = city;
+        this.streetAddress = streetAddress;
+        this.extendedAddress = extendedAddress;
+        this.postalCode = postalCode;
+    }
+
 }

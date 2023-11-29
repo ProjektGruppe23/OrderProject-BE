@@ -28,7 +28,7 @@ public class InitData implements CommandLineRunner
         shopify.setVendorName("Shopify");
         vendorRepository.save(shopify);
 
-         */
+*/
     }
 
 
