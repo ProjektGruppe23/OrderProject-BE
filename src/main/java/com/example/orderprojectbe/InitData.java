@@ -16,7 +16,7 @@ public class InitData implements CommandLineRunner
     @Override
     public void run(String... args) throws Exception
     {
-        Vendor reverb = new Vendor();
+        /*Vendor reverb = new Vendor();
         reverb.setVendorName("Reverb");
         vendorRepository.save(reverb);
 
@@ -27,5 +27,9 @@ public class InitData implements CommandLineRunner
         Vendor shopify = new Vendor();
         shopify.setVendorName("Shopify");
         vendorRepository.save(shopify);
+
+         */
     }
+
+
 }
