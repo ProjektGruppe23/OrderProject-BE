@@ -98,7 +98,6 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
 
             // Process each order
             List<Order> orders = new ArrayList<>();
-            Set<CostumerAddress> costumerAddressSet = new HashSet<>();
             Set<Country> countrySet = new HashSet<>();
             for (JsonNode orderNode : ordersNode) {
                 Order order = new Order();
@@ -117,15 +116,13 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
                 String displayLocation = orderNode.get("shipping_address").get("display_location").asText();
                 String countryName = country.getReverbCountrySubstring(displayLocation);
 
-                if(countryRepository.findCountryByCountryName(countryName).isPresent())
-                {
-                    costumerAddress.setCountry(countryRepository.findCountryByCountryName(countryName).get());
-                } else
-                {
+                var countryOptional = countryRepository.findCountryByCountryName(countryName);
+                if (countryOptional.isPresent()) {
+                    country = countryOptional.get();
+                } else {
+                    country = new Country();
                     country.setCountryName(countryName);
-                    costumerAddress.setCountry(country);
-                    countrySet.add(country);
-                    saveCountry(countrySet);
+                    countryRepository.save(country);
                 }
 
                 costumerAddress.setCity(orderNode.get("shipping_address").get("locality").asText());
@@ -135,12 +132,17 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
                 costumerAddress.setCostumerName(orderNode.get("shipping_address").get("name").asText());
                 costumerAddress.setPhone(orderNode.get("shipping_address").get("phone").asText());
 
+                var costumerAddressOptional = costumerAddressRepository.findCostumerAddressByCityAndStreetAddressAndExtendedAddressAndPostalCode(costumerAddress.getCity(), costumerAddress.getStreetAddress(), costumerAddress.getExtendedAddress(), costumerAddress.getPostalCode());
+                if (costumerAddressOptional.isPresent()) {
+                    System.out.println(" already exists. Skipping...");
+                    order.setCostumerAddress(costumerAddressOptional.get());
+                } else {
+                    costumerAddress.setCountry(country);
+                    System.out.println(" inserted.");
+                    order.setCostumerAddress(costumerAddress);
+                    costumerAddressRepository.save(costumerAddress);
+                }
 
-                order.setCostumerAddress(costumerAddress);
-
-
-                costumerAddressSet.add(costumerAddress);
-                saveCostumerAddress(costumerAddressSet);
                 orders.add(order);
 
             }
