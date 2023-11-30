@@ -1,6 +1,8 @@
 package com.example.orderprojectbe.RESTController;
 
+import com.example.orderprojectbe.model.ArchivedOrder;
 import com.example.orderprojectbe.model.Order;
+import com.example.orderprojectbe.repository.ArchivedOrderRepository;
 import com.example.orderprojectbe.repository.CostumerAddressRepository;
 import com.example.orderprojectbe.repository.OrderRepository;
 import com.example.orderprojectbe.service.reverb.ReverbApiServiceGetAllOrders;
@@ -29,6 +31,8 @@ public class OrderRESTController
     @Autowired
     CostumerAddressRepository CostumerAddressRepository;
 
+    @Autowired
+    ArchivedOrderRepository archivedOrderRepository;
 
     @GetMapping("/getorders")
     public List<Order> getOrders()
@@ -57,13 +61,26 @@ public class OrderRESTController
         try
         {
             Optional<Order> selectedOrder = orderRepository.findById(orderId);
+
             if ( selectedOrder.isPresent() )
             {
-                // Order with the specified ID exists, so delete it
-                System.out.println("order with id " + orderId + " deleted successfully");
-                System.out.println("ID: " + orderId + ", Api ID: " + selectedOrder.get().getOrderApiId() + ", Product name: " + selectedOrder.get().getProductName() + ", Quantity: " + selectedOrder.get().getQuantity() + ", Vendor: " + selectedOrder.get().getVendor());
+                Order orderToDelete = selectedOrder.get();
+
+                ArchivedOrder archivedOrder = new ArchivedOrder();
+                archivedOrder.setOrderId(orderToDelete.getOrderId());
+                archivedOrder.setProductName(orderToDelete.getProductName());
+                archivedOrder.setPrice(orderToDelete.getPrice());
+                archivedOrder.setQuantity(orderToDelete.getQuantity());
+                archivedOrder.setOrderApiId(orderToDelete.getOrderApiId());
+                archivedOrder.setCostumerAddress(orderToDelete.getCostumerAddress());
+                archivedOrder.setVendor(orderToDelete.getVendor());
+
+                archivedOrderRepository.save(archivedOrder);
+
                 orderRepository.deleteById(orderId);
-                return ResponseEntity.ok("Order deleted successfully");
+
+                System.out.println("Order with id " + orderId + " deleted and archived successfully");
+                return ResponseEntity.ok("Order deleted and archived successfully");
             }
             else
             {

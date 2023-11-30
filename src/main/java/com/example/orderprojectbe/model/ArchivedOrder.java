@@ -17,9 +17,19 @@ public class ArchivedOrder
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int orderId;
+    private int id;
     private String orderApiId;
     private String productName;
     private double price;
     private int quantity;
+    private int orderId;
+
+    @ManyToOne
+    @JoinColumn(name = "costumerAddressId", referencedColumnName = "costumerAddressId")
+    private CostumerAddress costumerAddress;
+
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "vendorId", referencedColumnName = "vendorId")
+    private Vendor vendor;
 }
