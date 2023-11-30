@@ -112,7 +112,7 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
                 order.setPrice(orderNode.get("amount_product").get("amount").asDouble());
                 order.setQuantity(orderNode.get("quantity").asInt());
 
-                order.setVendor(vendorRepository.findByVendorName("Reverb"));
+                order.setVendor(vendorRepository.findVendorByVendorName("Reverb"));
 
                 String displayLocation = orderNode.get("shipping_address").get("display_location").asText();
                 String countryName = country.getReverbCountrySubstring(displayLocation);

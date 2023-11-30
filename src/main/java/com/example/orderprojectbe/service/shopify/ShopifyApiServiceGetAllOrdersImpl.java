@@ -96,7 +96,7 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
                         order.setProductName(productName);
                         order.setPrice(price);
                         order.setQuantity(quantity);
-                        order.setVendor(vendorRepository.findByVendorName("Shopify"));
+                        order.setVendor(vendorRepository.findVendorByVendorName("Shopify"));
                     }
                 }
 
