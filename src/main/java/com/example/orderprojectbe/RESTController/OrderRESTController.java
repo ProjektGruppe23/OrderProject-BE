@@ -76,4 +76,10 @@ public class OrderRESTController
         }
     }
 
+    @GetMapping("/get2")
+    public String get2()
+    {
+        return "get2";
+    }
+
 }

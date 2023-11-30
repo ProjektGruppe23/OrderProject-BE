@@ -1,5 +1,6 @@
 package com.example.orderprojectbe.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -9,7 +10,6 @@ import lombok.ToString;
 
 import java.util.List;
 
-@Data
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "vendorId")
 public class Vendor {
@@ -20,9 +20,38 @@ public class Vendor {
 
     private String vendorName;
 
-    @ToString.Exclude
     @OneToMany(mappedBy = "vendor")
-    @JsonManagedReference
+    @JsonBackReference
     private List<Order> orders;
+
+    public int getVendorId()
+    {
+        return vendorId;
+    }
+
+    public void setVendorId(int vendorId)
+    {
+        this.vendorId = vendorId;
+    }
+
+    public String getVendorName()
+    {
+        return vendorName;
+    }
+
+    public void setVendorName(String vendorName)
+    {
+        this.vendorName = vendorName;
+    }
+
+    public List<Order> getOrders()
+    {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders)
+    {
+        this.orders = orders;
+    }
 }
 
