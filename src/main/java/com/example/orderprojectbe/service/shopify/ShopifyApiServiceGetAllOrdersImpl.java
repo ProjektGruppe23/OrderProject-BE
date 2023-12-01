@@ -96,7 +96,7 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
                         order.setProductName(productName);
                         order.setPrice(price);
                         order.setQuantity(quantity);
-                        order.setVendor(vendorRepository.findByVendorName("Shopify"));
+                        order.setVendor(vendorRepository.findVendorByVendorName("Shopify"));
                     }
                 }
 
@@ -132,7 +132,7 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
                     }
                 }
 
-                List<Order> ordersCheckList = orderRepository.findOrderApiIdAndVendor(order.getOrderApiId(), order.getVendor());
+                List<Order> ordersCheckList = orderRepository.findOrderByOrderApiIdAndVendor(order.getOrderApiId(), order.getVendor());
                 if (!ordersCheckList.isEmpty()) {
                     System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor() + " already exists. Skipping...");
                 } else {
