@@ -11,7 +11,6 @@ import lombok.ToString;
 import java.util.List;
 
 @Entity
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "vendorId")
 public class Vendor {
 
     @Id
