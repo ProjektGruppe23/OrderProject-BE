@@ -99,7 +99,8 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
             // Process each order
             List<Order> orders = new ArrayList<>();
             Set<Country> countrySet = new HashSet<>();
-            for (JsonNode orderNode : ordersNode) {
+            for (JsonNode orderNode : ordersNode)
+            {
                 Order order = new Order();
 
                 CostumerAddress costumerAddress = new CostumerAddress();
@@ -111,15 +112,17 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
                 order.setPrice(orderNode.get("amount_product").get("amount").asDouble());
                 order.setQuantity(orderNode.get("quantity").asInt());
 
-                order.setVendor(vendorRepository.findByVendorName("Reverb"));
+                order.setVendor(vendorRepository.findVendorByVendorName("Reverb"));
 
                 String displayLocation = orderNode.get("shipping_address").get("display_location").asText();
                 String countryName = country.getReverbCountrySubstring(displayLocation);
 
                 var countryOptional = countryRepository.findCountryByCountryName(countryName);
-                if (countryOptional.isPresent()) {
+                if (countryOptional.isPresent())
+                {
                     country = countryOptional.get();
-                } else {
+                } else
+                {
                     country = new Country();
                     country.setCountryName(countryName);
                     countryRepository.save(country);
@@ -133,21 +136,28 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
                 costumerAddress.setPhone(orderNode.get("shipping_address").get("phone").asText());
 
                 var costumerAddressOptional = costumerAddressRepository.findCostumerAddressByCityAndStreetAddressAndExtendedAddressAndPostalCode(costumerAddress.getCity(), costumerAddress.getStreetAddress(), costumerAddress.getExtendedAddress(), costumerAddress.getPostalCode());
-                if (costumerAddressOptional.isPresent()) {
+                if (costumerAddressOptional.isPresent())
+                {
                     System.out.println(" already exists. Skipping...");
                     order.setCostumerAddress(costumerAddressOptional.get());
-                } else {
+                } else
+                {
                     costumerAddress.setCountry(country);
                     System.out.println(" inserted.");
                     order.setCostumerAddress(costumerAddress);
                     costumerAddressRepository.save(costumerAddress);
                 }
 
-                orders.add(order);
-
+                List<Order> ordersCheckList = orderRepository.findOrderByOrderApiIdAndVendor(order.getOrderApiId(), order.getVendor());
+                if (!ordersCheckList.isEmpty())
+                {
+                    System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor() + " already exists. Skipping...");
+                } else
+                {
+                    orders.add(order);
+                    System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor() + " inserted.");
+                }
             }
-
-            // Save orders to the database if needed
             saveOrders(orders);
 
             System.out.println("Processed Orders: " + orders);

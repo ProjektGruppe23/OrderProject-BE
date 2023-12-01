@@ -1,5 +1,6 @@
 package com.example.orderprojectbe.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class CostumerAddress
     private Country country;
 
     @OneToMany(mappedBy = "costumerAddress", cascade = CascadeType.REMOVE)
+    @JsonBackReference
     private List<Order> order;
 
     public CostumerAddress(){};
