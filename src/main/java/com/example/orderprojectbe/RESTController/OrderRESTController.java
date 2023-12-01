@@ -67,13 +67,11 @@ public class OrderRESTController
                 Order orderToDelete = selectedOrder.get();
 
                 ArchivedOrder archivedOrder = new ArchivedOrder();
-                archivedOrder.setOrderId(orderToDelete.getOrderId());
                 archivedOrder.setProductName(orderToDelete.getProductName());
+                archivedOrder.setCountry(orderToDelete.getCostumerAddress().getCountry().getCountryName());
                 archivedOrder.setPrice(orderToDelete.getPrice());
                 archivedOrder.setQuantity(orderToDelete.getQuantity());
-                archivedOrder.setOrderApiId(orderToDelete.getOrderApiId());
-                archivedOrder.setCostumerAddress(orderToDelete.getCostumerAddress());
-                archivedOrder.setVendor(orderToDelete.getVendor());
+                archivedOrder.setVendor(orderToDelete.getVendor().getVendorName());
 
                 archivedOrderRepository.save(archivedOrder);
 
