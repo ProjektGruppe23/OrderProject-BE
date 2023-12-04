@@ -55,6 +55,12 @@ public class OrderRESTController
         return lstOrders;
     }
 
+    @GetMapping("getArchivedOrders")
+    public List<ArchivedOrder> getArchivedOrders()
+    {
+        return archivedOrderRepository.findAll();
+    }
+
     @DeleteMapping("/deleteOrder/{orderId}")
     public ResponseEntity<String> deleteOrder(@PathVariable int orderId)
     {
