@@ -102,16 +102,25 @@ public class OrderRESTController
 
     @GetMapping("/getCustomerAddressByOrderId/{orderId}")
     public ResponseEntity<CostumerAddress> getCustomerAddressByOrderId(@PathVariable int orderId) {
-        Optional<Order> order = orderRepository.findById(orderId);
+        Order order = orderRepository.findById(orderId).get(); // Directly get the Order
+        CostumerAddress customerAddress = order.getCostumerAddress(); // Get the CustomerAddress from the Order
 
-        if (order.isPresent()) {
-            CostumerAddress customerAddress = order.get().getCostumerAddress();
-            if (customerAddress != null) {
-                return ResponseEntity.ok(customerAddress);
-            }
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(customerAddress); // Return the CustomerAddress
     }
+
+
+//    @GetMapping("/getCustomerAddressByOrderId/{orderId}")
+//    public ResponseEntity<CostumerAddress> getCustomerAddressByOrderId(@PathVariable int orderId) {
+//        Optional<Order> order = orderRepository.findById(orderId);
+//
+//        if (order.isPresent()) {
+//            CostumerAddress customerAddress = order.get().getCostumerAddress();
+//            if (customerAddress != null) {
+//                return ResponseEntity.ok(customerAddress);
+//            }
+//        }
+//        return ResponseEntity.notFound().build();
+//    }
 
 
 
