@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ArchivedOrderRepository extends JpaRepository<ArchivedOrder, Integer>
 {
-    List<ArchivedOrder> findArchivedOrderByOrderApiIdAndVendor(String orderApiId, String vendor);
+    //List<ArchivedOrder> findArchivedOrderByOrderApiIdAndVendor(String orderApiId, String vendor);
 
     /*
     public void checkIfOrderAlreadyExists(List<Order> orders, List<ArchivedOrder> archivedOrders, Order order) {
