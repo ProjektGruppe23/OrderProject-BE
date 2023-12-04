@@ -4,6 +4,7 @@ import com.example.orderprojectbe.model.CostumerAddress;
 import com.example.orderprojectbe.model.Country;
 import com.example.orderprojectbe.model.Order;
 import com.example.orderprojectbe.repository.*;
+import com.example.orderprojectbe.service.ApiService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
-public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAllOrders {
+public class ShopifyApiServiceGetAllOrdersImpl extends ApiService implements ShopifyApiServiceGetAllOrders
+{
 
     private final RestTemplate restTemplate;
 
@@ -85,60 +87,24 @@ public class ShopifyApiServiceGetAllOrdersImpl implements ShopifyApiServiceGetAl
             for (JsonNode orderNode : ordersNode) {
                 Order order = new Order();
                 order.setOrderApiId(orderNode.get("id").asText());
+                order.setVendor(vendorRepository.findVendorByVendorName("Shopify"));
 
                 JsonNode lineItemsNode = orderNode.get("line_items");
                 if (lineItemsNode != null && lineItemsNode.isArray()) {
                     for (JsonNode itemNode : lineItemsNode) {
-                        String productName = itemNode.get("name").asText("");
-                        double price = Double.parseDouble(itemNode.get("price_set").get("shop_money").get("amount").asText("0.0"));
-                        int quantity = itemNode.get("quantity").asInt(0);
+                        setOrderDetailsFromApi(order, itemNode);
 
-                        order.setProductName(productName);
-                        order.setPrice(price);
-                        order.setQuantity(quantity);
-                        order.setVendor(vendorRepository.findVendorByVendorName("Shopify"));
                     }
                 }
 
                 JsonNode shippingAddressNode = orderNode.get("shipping_address");
+
                 if (shippingAddressNode != null) {
-                    CostumerAddress costumerAddress = new CostumerAddress();
-                    costumerAddress.setCity(shippingAddressNode.get("city").asText());
-                    costumerAddress.setStreetAddress(shippingAddressNode.get("address1").asText());
-                    costumerAddress.setExtendedAddress(shippingAddressNode.get("address2").asText());
-                    costumerAddress.setPostalCode(shippingAddressNode.get("zip").asText());
-                    costumerAddress.setCostumerName(shippingAddressNode.get("name").asText());
-                    costumerAddress.setPhone(shippingAddressNode.get("phone").asText());
-
                     String countryName = shippingAddressNode.get("country").asText();
-                    Country country;
-                    var countryOptional = countryRepository.findCountryByCountryName(countryName);
-                    if (countryOptional.isPresent()) {
-                        country = countryOptional.get();
-                    } else {
-                        country = new Country();
-                        country.setCountryName(countryName);
-                        countryRepository.save(country);
-                    }
-                    var costumerAddressOptional = costumerAddressRepository.findCostumerAddressByCityAndStreetAddressAndExtendedAddressAndPostalCode(costumerAddress.getCity(), costumerAddress.getStreetAddress(), costumerAddress.getExtendedAddress(), costumerAddress.getPostalCode());
-                    if (costumerAddressOptional.isPresent()) {
-                        System.out.println(" already exists. Skipping...");
-                        order.setCostumerAddress(costumerAddressOptional.get());
-                    } else {
-                        costumerAddress.setCountry(country);
-                        System.out.println(" inserted.");
-                        order.setCostumerAddress(costumerAddress);
-                        costumerAddressRepository.save(costumerAddress);
-                    }
+                    setCostumerAddressFromApi(shippingAddressNode, countryName, order, "city", "address1", "address2", "zip", "name", "phone");
                 }
 
-                List<Order> ordersCheckList = orderRepository.findOrderByOrderApiIdAndVendor(order.getOrderApiId(), order.getVendor());
-                if (!ordersCheckList.isEmpty()) {
-                    System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor() + " already exists. Skipping...");
-                } else {
-                    orders.add(order);
-                    System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor() + " inserted.");
-                }
+                checkIfOrderAlreadyExists(orders, order);
             }
             saveOrders(orders);
 

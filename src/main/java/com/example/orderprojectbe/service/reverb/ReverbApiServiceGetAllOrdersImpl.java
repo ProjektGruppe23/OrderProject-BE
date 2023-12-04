@@ -9,6 +9,7 @@ import com.example.orderprojectbe.repository.CostumerAddressRepository;
 import com.example.orderprojectbe.repository.CountryRepository;
 import com.example.orderprojectbe.repository.OrderRepository;
 import com.example.orderprojectbe.repository.VendorRepository;
+import com.example.orderprojectbe.service.ApiService;
 import com.example.orderprojectbe.service.reverb.ReverbApiServiceGetAllOrders;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllOrders
+public class ReverbApiServiceGetAllOrdersImpl extends ApiService implements ReverbApiServiceGetAllOrders
 {
 
     private final RestTemplate restTemplate;
@@ -106,57 +107,22 @@ public class ReverbApiServiceGetAllOrdersImpl implements ReverbApiServiceGetAllO
                 CostumerAddress costumerAddress = new CostumerAddress();
                 Country country = new Country();
 
-                // Extract specific fields from the orderNode and set them in the Order object
-                order.setOrderApiId(orderNode.get("order_number").asText());
-                order.setProductName(orderNode.get("title").asText());
-                order.setPrice(orderNode.get("amount_product").get("amount").asDouble());
-                order.setQuantity(orderNode.get("quantity").asInt());
-
                 order.setVendor(vendorRepository.findVendorByVendorName("Reverb"));
 
+                // Extract specific fields from the orderNode and set them in the Order object
+                setOrderDetailsFromApi(order, orderNode);
+
                 String displayLocation = orderNode.get("shipping_address").get("display_location").asText();
-                String countryName = country.getReverbCountrySubstring(displayLocation);
 
-                var countryOptional = countryRepository.findCountryByCountryName(countryName);
-                if (countryOptional.isPresent())
-                {
-                    country = countryOptional.get();
-                } else
-                {
-                    country = new Country();
-                    country.setCountryName(countryName);
-                    countryRepository.save(country);
+                JsonNode shippingAddressNode = orderNode.get("shipping_address");
+
+                if (shippingAddressNode != null) {
+                    String countryName = country.getReverbCountrySubstring(displayLocation);
+                    setCostumerAddressFromApi(shippingAddressNode, countryName, order, "locality", "street_address", "extended_address", "postal_code", "name", "phone");
                 }
 
-                costumerAddress.setCity(orderNode.get("shipping_address").get("locality").asText());
-                costumerAddress.setStreetAddress(orderNode.get("shipping_address").get("street_address").asText());
-                costumerAddress.setExtendedAddress(orderNode.get("shipping_address").get("extended_address").asText());
-                costumerAddress.setPostalCode(orderNode.get("shipping_address").get("postal_code").asText());
-                costumerAddress.setCostumerName(orderNode.get("shipping_address").get("name").asText());
-                costumerAddress.setPhone(orderNode.get("shipping_address").get("phone").asText());
 
-                var costumerAddressOptional = costumerAddressRepository.findCostumerAddressByCityAndStreetAddressAndExtendedAddressAndPostalCode(costumerAddress.getCity(), costumerAddress.getStreetAddress(), costumerAddress.getExtendedAddress(), costumerAddress.getPostalCode());
-                if (costumerAddressOptional.isPresent())
-                {
-                    System.out.println(" already exists. Skipping...");
-                    order.setCostumerAddress(costumerAddressOptional.get());
-                } else
-                {
-                    costumerAddress.setCountry(country);
-                    System.out.println(" inserted.");
-                    order.setCostumerAddress(costumerAddress);
-                    costumerAddressRepository.save(costumerAddress);
-                }
-
-                List<Order> ordersCheckList = orderRepository.findOrderByOrderApiIdAndVendor(order.getOrderApiId(), order.getVendor());
-                if (!ordersCheckList.isEmpty())
-                {
-                    System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor() + " already exists. Skipping...");
-                } else
-                {
-                    orders.add(order);
-                    System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor() + " inserted.");
-                }
+                checkIfOrderAlreadyExists(orders, order);
             }
             saveOrders(orders);
 
