@@ -1,12 +1,10 @@
 package com.example.orderprojectbe.service;
 
+import com.example.orderprojectbe.model.ArchivedOrder;
 import com.example.orderprojectbe.model.CostumerAddress;
 import com.example.orderprojectbe.model.Country;
 import com.example.orderprojectbe.model.Order;
-import com.example.orderprojectbe.repository.CostumerAddressRepository;
-import com.example.orderprojectbe.repository.CountryRepository;
-import com.example.orderprojectbe.repository.OrderRepository;
-import com.example.orderprojectbe.repository.VendorRepository;
+import com.example.orderprojectbe.repository.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +25,9 @@ public abstract class ApiService
 
     @Autowired
     OrderRepository orderRepository;
+
+    @Autowired
+    ArchivedOrderRepository archivedOrderRepository;
 
 
     public void setOrderDetailsFromApi(Order order, JsonNode orderNode)
@@ -80,11 +81,11 @@ public abstract class ApiService
 
         var costumerAddressOptional = costumerAddressRepository.findCostumerAddressByCityAndStreetAddressAndExtendedAddressAndPostalCode(costumerAddress.getCity(), costumerAddress.getStreetAddress(), costumerAddress.getExtendedAddress(), costumerAddress.getPostalCode());
         if (costumerAddressOptional.isPresent()) {
-            System.out.println(" already exists. Skipping...");
+            System.out.println("Address already exists. Skipping...");
             order.setCostumerAddress(costumerAddressOptional.get());
         } else {
             costumerAddress.setCountry(country);
-            System.out.println(" inserted.");
+            System.out.println("Country: " + country + " has been inserted.");
             order.setCostumerAddress(costumerAddress);
             costumerAddressRepository.save(costumerAddress);
         }
@@ -92,16 +93,24 @@ public abstract class ApiService
 
     }
 
-    public void checkIfOrderAlreadyExists(List<Order> orders, Order order)
-    {
+    public void checkIfOrderAlreadyExists(List<Order> orders, Order order) {
+
         List<Order> ordersCheckList = orderRepository.findOrderByOrderApiIdAndVendor(order.getOrderApiId(), order.getVendor());
+
+        List<ArchivedOrder> archivedOrdersCheckList = archivedOrderRepository.findArchivedOrderByApiIdAndVendor(order.getOrderApiId(), order.getVendor().getVendorName());
+
         if (!ordersCheckList.isEmpty())
         {
-            System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor() + " already exists. Skipping...");
-        } else
+            System.out.println("Order from API: " + order.getVendor().getVendorName() + ", with ID: " + order.getOrderApiId() + ", already exists in orders. Skipping...");
+        }
+        else if (!archivedOrdersCheckList.isEmpty())
+        {
+            System.out.println("Order from API: " + order.getVendor().getVendorName() + ", with ID: " + order.getOrderApiId() + ", already exists in archived orders. Skipping...");
+        }
+        else
         {
             orders.add(order);
-            System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor() + " inserted.");
+            System.out.println("Order with ID " + order.getOrderApiId() + " and vendor " + order.getVendor().getVendorName() + " inserted.");
         }
     }
 }
