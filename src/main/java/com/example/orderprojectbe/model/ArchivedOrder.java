@@ -22,5 +22,6 @@ public class ArchivedOrder
     private double price;
     private int quantity;
     private String country;
+    private String apiId;
     private String vendor;
 }
