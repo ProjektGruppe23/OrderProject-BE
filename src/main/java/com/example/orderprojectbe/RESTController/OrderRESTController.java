@@ -1,6 +1,7 @@
 package com.example.orderprojectbe.RESTController;
 
 import com.example.orderprojectbe.model.ArchivedOrder;
+import com.example.orderprojectbe.model.CostumerAddress;
 import com.example.orderprojectbe.model.Order;
 import com.example.orderprojectbe.repository.ArchivedOrderRepository;
 import com.example.orderprojectbe.repository.CostumerAddressRepository;
@@ -97,5 +98,26 @@ public class OrderRESTController
     {
         return "get2";
     }
+
+    
+    @GetMapping("/getCustomerAddressByOrderId/{orderId}")
+    public ResponseEntity<CostumerAddress> getCustomerAddressByOrderId(@PathVariable int orderId) {
+        Optional<Order> order = orderRepository.findById(orderId);
+
+        if (order.isPresent()) {
+            CostumerAddress customerAddress = order.get().getCostumerAddress();
+            if (customerAddress != null) {
+                return ResponseEntity.ok(customerAddress);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
+
+
+
+
+
 
 }
