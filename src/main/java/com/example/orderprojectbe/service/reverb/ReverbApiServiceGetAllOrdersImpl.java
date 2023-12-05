@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -75,6 +76,7 @@ public class ReverbApiServiceGetAllOrdersImpl extends ApiService implements Reve
     public List<Order> getAllOrders() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + apiKey);
+        headers.set("Accept-Version", "3.0");
 
         RequestEntity<Void> requestEntity;
         try {
@@ -128,7 +130,7 @@ public class ReverbApiServiceGetAllOrdersImpl extends ApiService implements Reve
 
             System.out.println("Processed Orders: " + orders);
             return orders;
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             throw new RuntimeException("Error parsing JSON response", e);
         }
     }

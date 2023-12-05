@@ -1,14 +1,13 @@
 package com.example.orderprojectbe.service;
 
-import com.example.orderprojectbe.model.ArchivedOrder;
-import com.example.orderprojectbe.model.CostumerAddress;
-import com.example.orderprojectbe.model.Country;
-import com.example.orderprojectbe.model.Order;
+import com.example.orderprojectbe.model.*;
 import com.example.orderprojectbe.repository.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -29,8 +28,11 @@ public abstract class ApiService
     @Autowired
     ArchivedOrderRepository archivedOrderRepository;
 
+    @Autowired
+    DateClassRepository dateClassRepository;
 
-    public void setOrderDetailsFromApi(Order order, JsonNode orderNode)
+
+    public void setOrderDetailsFromApi(Order order, JsonNode orderNode) throws ParseException
     {
         if(order.getVendor().getVendorName().equals("Reverb"))
         {
@@ -38,13 +40,13 @@ public abstract class ApiService
             order.setProductName(orderNode.get("title").asText());
             order.setPrice(orderNode.get("amount_product").get("amount").asDouble());
             order.setQuantity(orderNode.get("quantity").asInt());
+            order.setDate(setDateFromApi(orderNode.get("created_at").asText()));
         }
         else if(order.getVendor().getVendorName().equals("Shopify"))
         {
                     order.setProductName(orderNode.get("name").asText(""));
                     order.setPrice(Double.parseDouble(orderNode.get("price_set").get("shop_money").get("amount").asText("0.0")));
                     order.setQuantity(orderNode.get("quantity").asInt(0));
-
         }
 
     }
@@ -64,6 +66,22 @@ public abstract class ApiService
         }
 
         return country;
+    }
+
+    public DateClass setDateFromApi(String dateString) throws ParseException
+    {
+        DateClass dateClass = new DateClass();
+        String formattedDate = dateClass.changeStringDateToDateFormat(dateString);
+        var dateOptional = dateClassRepository.findDateClassByDate(formattedDate);
+        if (dateOptional.isPresent())
+        {
+            dateClass = dateOptional.get();
+        } else
+        {
+            dateClass.setDate(formattedDate);
+            dateClassRepository.save(dateClass);
+        }
+        return dateClass;
     }
 
     public void setCostumerAddressFromApi(JsonNode shippingAddressNode, String countryName, Order order, String city, String streetAddress, String extendedAddress, String postalCode, String costumerName, String phone)
@@ -92,6 +110,7 @@ public abstract class ApiService
 
 
     }
+
 
     public void checkIfOrderAlreadyExists(List<Order> orders, Order order) {
 
