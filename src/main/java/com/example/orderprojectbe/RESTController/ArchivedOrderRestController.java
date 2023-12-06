@@ -1,5 +1,6 @@
 package com.example.orderprojectbe.RESTController;
 
+import com.example.orderprojectbe.DTO.AnalyticsInfoDTO;
 import com.example.orderprojectbe.model.ArchivedOrder;
 import com.example.orderprojectbe.model.Order;
 import com.example.orderprojectbe.repository.ArchivedOrderRepository;
@@ -28,24 +29,34 @@ public class ArchivedOrderRestController
     ArchivedOrderRepository archivedOrderRepository;
 
     @GetMapping("/getinfotoanalyze")
-    public ResponseEntity<List<String>> getInfoToAnalyse()
+    public ResponseEntity<List<AnalyticsInfoDTO>> getInfoToAnalyse()
     {
         List<ArchivedOrder> archivedOrders = archivedOrderRepository.findAll();
         List<Order> orders = orderRepository.findAll();
-        List<String> getInfoToAnalyse = new ArrayList<>();
+        List<AnalyticsInfoDTO> getInfoToAnalyse = new ArrayList<>();
 
         try
         {
             for ( Order order : orders )
             {
-                String infoOrder = "Country: " + order.getCostumerAddress().getCountry().getCountryName() + " - vendor: " + order.getVendor().getVendorName() + " - product: " + order.getProductName() + " - price: " + order.getPrice();
-                getInfoToAnalyse.add(infoOrder);
+                AnalyticsInfoDTO orderInfo = new AnalyticsInfoDTO(
+                        order.getCostumerAddress().getCountry().getCountryName(),
+                        order.getVendor().getVendorName(),
+                        order.getProductName(),
+                        order.getPrice()
+                );
+                getInfoToAnalyse.add(orderInfo);
             }
 
-            for ( ArchivedOrder order : archivedOrders )
+            for ( ArchivedOrder archivedOrder : archivedOrders )
             {
-                String infoArchivedOrder = "Country: " + order.getCountry() + " - vendor: " + order.getVendor() + " - product: " + order.getProductName() + " - price: " + order.getPrice();
-                getInfoToAnalyse.add(infoArchivedOrder);
+                AnalyticsInfoDTO orderInfo = new AnalyticsInfoDTO(
+                        archivedOrder.getCountry(),
+                        archivedOrder.getVendor(),
+                        archivedOrder.getProductName(),
+                        archivedOrder.getPrice()
+                );
+                getInfoToAnalyse.add(orderInfo);
             }
         }
         catch (Exception e)
