@@ -2,8 +2,7 @@ package com.example.orderprojectbe.model;
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+
 
 @Entity
 @Table(name = "`order`")
@@ -16,6 +15,11 @@ public class Order {
     private String productName;
     private double price;
     private int quantity;
+
+    @ManyToOne
+    @JsonManagedReference
+    @JoinColumn(name = "dateId", referencedColumnName = "dateId")
+    private DateClass date;
 
     @ManyToOne
     @JoinColumn(name = "costumerAddressId", referencedColumnName = "costumerAddressId")
@@ -102,6 +106,16 @@ public class Order {
     public void setVendor(Vendor vendor)
     {
         this.vendor = vendor;
+    }
+
+    public DateClass getDate()
+    {
+        return date;
+    }
+
+    public void setDate(DateClass date)
+    {
+        this.date = date;
     }
 }
 

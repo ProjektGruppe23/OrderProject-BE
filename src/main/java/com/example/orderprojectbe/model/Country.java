@@ -8,7 +8,6 @@ import lombok.Data;
 import java.lang.reflect.Array;
 import java.util.List;
 
-@Data
 @Entity
 public class Country {
 
@@ -27,5 +26,35 @@ public class Country {
         countryName = countryName.trim();
         return countryName;
 
+    }
+
+    public int getCountryId()
+    {
+        return countryId;
+    }
+
+    public void setCountryId(int countryId)
+    {
+        this.countryId = countryId;
+    }
+
+    public String getCountryName()
+    {
+        return countryName;
+    }
+
+    public void setCountryName(String countryName)
+    {
+        this.countryName = countryName;
+    }
+
+    public List<CostumerAddress> getCostumerAddress()
+    {
+        return costumerAddress;
+    }
+
+    public void setCostumerAddress(List<CostumerAddress> costumerAddress)
+    {
+        this.costumerAddress = costumerAddress;
     }
 }

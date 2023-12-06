@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.*;
 
 @Service
@@ -87,6 +88,7 @@ public class ShopifyApiServiceGetAllOrdersImpl extends ApiService implements Sho
             for (JsonNode orderNode : ordersNode) {
                 Order order = new Order();
                 order.setOrderApiId(orderNode.get("id").asText());
+                order.setDate(setDateFromApi(orderNode.get("created_at").asText()));
                 order.setVendor(vendorRepository.findVendorByVendorName("Shopify"));
 
                 JsonNode lineItemsNode = orderNode.get("line_items");
@@ -109,7 +111,7 @@ public class ShopifyApiServiceGetAllOrdersImpl extends ApiService implements Sho
             saveOrders(orders);
 
             return orders;
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             throw new RuntimeException("Error parsing JSON response", e);
         }
     }
