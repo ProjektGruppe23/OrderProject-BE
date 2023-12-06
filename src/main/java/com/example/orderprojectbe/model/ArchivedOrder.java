@@ -24,4 +24,26 @@ public class ArchivedOrder
     private String country;
     private String apiId;
     private String vendor;
+
+   /* public ArchivedOrder(String country, String vendor)
+    {
+        this.country = country;
+        this.vendor = vendor;
+    }*/
+
+
+
+    public ArchivedOrder()
+    {
+    }
+
+    public ArchivedOrder(String productName, String country, double price, int quantity, String apiId, String vendor)
+    {
+        this.productName = productName;
+        this.country = country;
+        this.price = price;
+        this.quantity = quantity;
+        this.apiId = apiId;
+        this.vendor = vendor;
+    }
 }
