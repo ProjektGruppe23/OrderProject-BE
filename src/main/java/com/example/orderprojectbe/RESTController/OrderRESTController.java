@@ -1,5 +1,6 @@
 package com.example.orderprojectbe.RESTController;
 
+import com.example.orderprojectbe.DTO.AnalyticsInfoDTO;
 import com.example.orderprojectbe.model.ArchivedOrder;
 import com.example.orderprojectbe.model.CostumerAddress;
 import com.example.orderprojectbe.model.Order;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,6 +113,45 @@ public class OrderRESTController
         CostumerAddress customerAddress = order.getCostumerAddress(); // Get the CustomerAddress from the Order
 
         return ResponseEntity.ok(customerAddress); // Return the CustomerAddress
+    }
+
+    @GetMapping("/getinfotoanalyze")
+    public ResponseEntity<List<AnalyticsInfoDTO>> getInfoToAnalyse()
+    {
+        List<ArchivedOrder> archivedOrders = archivedOrderRepository.findAll();
+        List<Order> orders = orderRepository.findAll();
+        List<AnalyticsInfoDTO> getInfoToAnalyse = new ArrayList<>();
+
+        try
+        {
+            for ( Order order : orders )
+            {
+                AnalyticsInfoDTO orderInfo = new AnalyticsInfoDTO(
+                        order.getCostumerAddress().getCountry().getCountryName(),
+                        order.getVendor().getVendorName(),
+                        order.getProductName(),
+                        order.getPrice()
+                );
+                getInfoToAnalyse.add(orderInfo);
+            }
+
+            for ( ArchivedOrder archivedOrder : archivedOrders )
+            {
+                AnalyticsInfoDTO orderInfo = new AnalyticsInfoDTO(
+                        archivedOrder.getCountry(),
+                        archivedOrder.getVendor(),
+                        archivedOrder.getProductName(),
+                        archivedOrder.getPrice()
+                );
+                getInfoToAnalyse.add(orderInfo);
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        return ResponseEntity.ok(getInfoToAnalyse);
     }
 
 }
