@@ -45,7 +45,15 @@ public abstract class ApiService
         else if(order.getVendor().getVendorName().equals("Shopify"))
         {
                     order.setProductName(orderNode.get("name").asText(""));
-                    order.setPrice(Double.parseDouble(orderNode.get("price_set").get("shop_money").get("amount").asText("0.0")));
+//                    order.setPrice(Double.parseDouble(orderNode.get("price_set").get("shop_money").get("amount").asText("0.0")));
+//                    double priceInDKK = Double.parseDouble(orderNode.get("price_set").get("shop_money").get("amount").asText("0.0"));
+//                    double priceInEUR = priceInDKK / 7.5;
+//                    order.setPrice(priceInEUR);
+                    double priceInDKK = Double.parseDouble(orderNode.get("price_set").get("shop_money").get("amount").asText("0.0"));
+                    double priceInEUR = priceInDKK / 7.5;
+
+                    double priceRounded = Math.round(priceInEUR * 100.0) / 100.0;
+                    order.setPrice(priceRounded);
                     order.setQuantity(orderNode.get("quantity").asInt(0));
         }
 
