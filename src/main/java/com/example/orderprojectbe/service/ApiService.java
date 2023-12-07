@@ -116,7 +116,7 @@ public abstract class ApiService
 
         List<Order> ordersCheckList = orderRepository.findOrderByOrderApiIdAndVendor(order.getOrderApiId(), order.getVendor());
 
-        List<ArchivedOrder> archivedOrdersCheckList = archivedOrderRepository.findArchivedOrderByApiIdAndVendor(order.getOrderApiId(), order.getVendor().getVendorName());
+        List<ArchivedOrder> archivedOrdersCheckList = archivedOrderRepository.findArchivedOrderByApiIdAndVendor(order.getOrderApiId(), order.getVendor());
 
         if (!ordersCheckList.isEmpty())
         {
