@@ -2,6 +2,7 @@ package com.example.orderprojectbe.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -21,7 +22,15 @@ public class ArchivedOrder
     private String productName;
     private double price;
     private int quantity;
-    private String country;
+
+    @ManyToOne
+    @JsonManagedReference
+    @JoinColumn(name = "countryId", referencedColumnName = "countryId")
+    private Country country;
     private String apiId;
-    private String vendor;
+
+    @ManyToOne
+    @JsonManagedReference
+    @JoinColumn(name = "vendorId", referencedColumnName = "vendorId")
+    private Vendor vendor;
 }

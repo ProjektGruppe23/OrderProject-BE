@@ -19,6 +19,10 @@ public class Country {
     @JsonBackReference
     private List<CostumerAddress> costumerAddress;
 
+    @OneToMany(mappedBy = "country")
+    @JsonBackReference
+    private List<ArchivedOrder> archivedOrders;
+
     public String getReverbCountrySubstring(String displayLocation)
     {
         String[] substring = displayLocation.split(",");
@@ -56,5 +60,15 @@ public class Country {
     public void setCostumerAddress(List<CostumerAddress> costumerAddress)
     {
         this.costumerAddress = costumerAddress;
+    }
+
+    public List<ArchivedOrder> getArchivedOrders()
+    {
+        return archivedOrders;
+    }
+
+    public void setArchivedOrders(List<ArchivedOrder> archivedOrders)
+    {
+        this.archivedOrders = archivedOrders;
     }
 }

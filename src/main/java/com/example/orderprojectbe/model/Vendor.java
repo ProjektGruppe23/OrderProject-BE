@@ -23,6 +23,11 @@ public class Vendor {
     @JsonBackReference
     private List<Order> orders;
 
+
+    @OneToMany(mappedBy = "vendor")
+    @JsonBackReference
+    private List<ArchivedOrder> archivedOrders;
+
     public int getVendorId()
     {
         return vendorId;
@@ -51,6 +56,16 @@ public class Vendor {
     public void setOrders(List<Order> orders)
     {
         this.orders = orders;
+    }
+
+    public List<ArchivedOrder> getArchivedOrders()
+    {
+        return archivedOrders;
+    }
+
+    public void setArchivedOrders(List<ArchivedOrder> archivedOrders)
+    {
+        this.archivedOrders = archivedOrders;
     }
 }
 
