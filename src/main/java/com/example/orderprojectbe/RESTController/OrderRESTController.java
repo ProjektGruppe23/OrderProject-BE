@@ -119,12 +119,12 @@ public class OrderRESTController
     public ResponseEntity<List<AnalyticsInfoDTO>> getInfoToAnalyse()
     {
         List<ArchivedOrder> archivedOrders = archivedOrderRepository.findAll();
-        List<Order> orders = orderRepository.findAll();
+        //List<Order> orders = orderRepository.findAll();
         List<AnalyticsInfoDTO> getInfoToAnalyse = new ArrayList<>();
 
         try
         {
-            for ( Order order : orders )
+            /*for ( Order order : orders )
             {
                 AnalyticsInfoDTO orderInfo = new AnalyticsInfoDTO(
                         order.getCostumerAddress().getCountry().getCountryName(),
@@ -133,7 +133,7 @@ public class OrderRESTController
                         order.getPrice()
                 );
                 getInfoToAnalyse.add(orderInfo);
-            }
+            }*/
 
             for ( ArchivedOrder archivedOrder : archivedOrders )
             {
