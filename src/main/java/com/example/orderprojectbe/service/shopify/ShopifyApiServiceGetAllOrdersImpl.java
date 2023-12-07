@@ -52,7 +52,7 @@ public class ShopifyApiServiceGetAllOrdersImpl extends ApiService implements Sho
         this.restTemplate = restTemplate;
     }
 
-    String shopifyUrl = "https://" + apiKey + ":" + tokenKey + "@8eff11-2.myshopify.com/admin/api/2023-01/orders.json?status=any";
+    String shopifyUrl = "https://" + apiKey + ":" + tokenKey + "@8eff11-2.myshopify.com/admin/api/2023-01/orders.json"; //?status=any for alle ordre
 
     private void saveOrders(List<Order> orders) {
         orders.forEach(reg -> orderRepository.save(reg));

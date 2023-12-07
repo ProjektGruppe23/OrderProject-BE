@@ -58,7 +58,7 @@ public class ReverbApiServiceGetAllOrdersImpl extends ApiService implements Reve
     }
 
     // Update the URL to the new endpoint
-    String reverbUrl = "https://api.reverb.com/api/my/orders/selling/all"; //awaiting_shipment
+    String reverbUrl = "https://api.reverb.com/api/my/orders/selling/awaiting_shipment"; //all i stedet for awaiting_shipment
 
     private void saveOrders(List<Order> orders) {
         orders.forEach(order -> orderRepository.save(order));
